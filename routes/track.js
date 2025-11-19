@@ -17,13 +17,14 @@ function parsePrice(raw) {
 
 router.post("/", async (req, res) => {
   try {
-    const { asin, url, price, title, image } = req.body;
+    const { asin, url, displayedPrice, numericPrice, title, image } = req.body;
+
+    const parsedPrice = parsePrice(displayedPrice);
 
     if (!asin) {
       return res.json({ success: false, error: "ASIN missing" });
     }
 
-    const numericPrice = parsePrice(price);
     let product = await Product.findOne({ asin });
 
     let dropDetected = false;
@@ -36,10 +37,10 @@ router.post("/", async (req, res) => {
         url,
         title,
         image,
-        initialPrice: numericPrice || null,
-        latestPrice: numericPrice || null,
+        initialPrice: numericPrice ?? parsedPrice ?? null,
+        latestPrice: numericPrice ?? parsedPrice ?? null,
         notified: false,
-        history: numericPrice ? [{ price: numericPrice, date: timestamp }] : []
+        history: (numericPrice ?? parsedPrice) ? [{ price: numericPrice ?? parsedPrice, date: timestamp }] : []
       });
 
       await product.save();
@@ -59,21 +60,21 @@ router.post("/", async (req, res) => {
 
     const oldPrice = product.latestPrice;
 
-    if (numericPrice && !isNaN(numericPrice)) {
-      product.latestPrice = numericPrice;
+    if (numericPrice ?? parsedPrice) {
+      const newPrice = numericPrice ?? parsedPrice;
+      product.latestPrice = newPrice;
 
-      // Add to price history if new price
       const last = product.history[product.history.length - 1];
-      if (!last || last.price !== numericPrice) {
-        product.history.push({ price: numericPrice, date: timestamp });
+      if (!last || last.price !== newPrice) {
+        product.history.push({ price: newPrice, date: timestamp });
       }
     }
 
     // Detect price drop
     if (
-      numericPrice &&
+      (numericPrice ?? parsedPrice) &&
       oldPrice &&
-      numericPrice < oldPrice
+      (numericPrice ?? parsedPrice) < oldPrice
     ) {
       dropDetected = true;
       product.notified = false;

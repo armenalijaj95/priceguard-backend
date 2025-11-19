@@ -37,8 +37,8 @@ async function loadProducts() {
             <h2>${p.title}</h2>
 
             <div class="price-row">
-                <span class="price-old">${initial ? initial.toFixed(2) + "€" : "-"}</span>
-                <span class="price-new">${latest ? latest.toFixed(2) + "€" : "-"}</span>
+                <span class="price-old">${p.initialPriceDisplay || (initial ? initial.toFixed(2) + "€" : "-")}</span>
+                <span class="price-new">${p.latestPriceDisplay || (latest ? latest.toFixed(2) + "€" : "-")}</span>
             </div>
 
             ${priceDropPercent > 0 ? 

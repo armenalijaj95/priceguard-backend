@@ -2,6 +2,8 @@ import express from "express";
 import { Product } from "../models/Product.js";
 import { scrapeAmazonProduct } from "../utils/scraper.js";
 
+/** Formats numbers into Amazon-like UI price strings */
+
 const router = express.Router();
 
 /**
@@ -60,11 +62,19 @@ router.post("/", async (req, res) => {
 
             await product.save();
 
+            // Format prices for UI (like Amazon)
+            const formatPrice = (p) => {
+                if (p === null || p === undefined || isNaN(p)) return "-";
+                return p.toFixed(2) + "€";
+            };
+
             results.push({
                 asin: product.asin,
                 title: product.title,
                 oldPrice,
+                oldPriceDisplay: formatPrice(oldPrice),
                 newPrice,
+                newPriceDisplay: formatPrice(newPrice),
                 priceChanged,
                 priceDropped
             });
