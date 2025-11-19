@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import cors from "cors";
 import trackRoute from "./routes/track.js";
 import checkPricesRoute from "./routes/check-prices.js"; // ✅ ADD THIS
+import productsRoute from "./routes/products.js";
 
 const app = express();
 
@@ -12,7 +13,7 @@ app.use(cors());
 // ✅ ROUTES
 app.use("/api/track", trackRoute);
 app.use("/api/check-prices", checkPricesRoute); // ✅ NOW IT WORKS
-
+app.use("/api/products", productsRoute);
 // Root for testing
 app.get("/", (req, res) => {
     res.send("PriceGuard API is running");
