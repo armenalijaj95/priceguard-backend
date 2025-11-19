@@ -1,21 +1,31 @@
-import "dotenv/config.js";
 import express from "express";
+import mongoose from "mongoose";
 import cors from "cors";
-import { connectDB } from "./db.js";
 import trackRoute from "./routes/track.js";
+import checkPricesRoute from "./routes/check-prices.js"; // ✅ ADD THIS
 
 const app = express();
-app.use(cors({ origin: "*" }));
 
 app.use(express.json());
+app.use(cors());
 
-connectDB();
+// ✅ ROUTES
+app.use("/api/track", trackRoute);
+app.use("/api/check-prices", checkPricesRoute); // ✅ NOW IT WORKS
 
+// Root for testing
 app.get("/", (req, res) => {
     res.send("PriceGuard API is running");
 });
 
-app.use("/api", trackRoute);
-app.use("/api/check-prices", checkPricesRoute);
+// MongoDB connection
+mongoose
+    .connect(process.env.MONGO_URI, { dbName: "priceguard" })
+    .then(() => console.log("MongoDB connected"))
+    .catch((err) => console.error("MongoDB error:", err));
+
+// PORT
 const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => console.log(`🚀 PriceGuard API running on port ${PORT}`));
+app.listen(PORT, () => {
+    console.log(`🚀 PriceGuard API running on port ${PORT}`);
+});
