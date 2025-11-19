@@ -1,281 +1,178 @@
+/* ===== GLOBAL ===== */
+
 body {
-    background: #f5f7fa;
+    background: linear-gradient(180deg, #eef2f6 0%, #ffffff 100%);
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 20px;
 }
 
+/* Header */
 header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
 }
 
 h1 {
     margin: 0;
-    font-size: 28px;
+    font-size: 24px;
+    font-weight: 700;
     color: #333;
 }
 
+/* Refresh button */
 #refreshBtn {
-    padding: 10px 20px;
+    padding: 6px 12px;
     border: none;
     background: #0077ff;
     color: white;
-    font-size: 16px;
-    border-radius: 8px;
+    font-size: 12px;
+    border-radius: 6px;
     cursor: pointer;
 }
-
 #refreshBtn:hover {
     background: #005fcc;
 }
 
+/* ===== GRID ===== */
+
 .grid {
     display: grid;
-    gap: 20px;
-    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 12px;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    padding-bottom: 30px;
 }
+
+/* ===== PRODUCT CARD ===== */
 
 .card {
-    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-    border-radius: 16px;
-    padding: 22px;
-    box-shadow: 0 8px 22px rgba(0,0,0,0.06);
-    border: 1px solid rgba(0,0,0,0.05);
-    transition: transform 0.2s ease, box-shadow 0.25s ease;
+    background: linear-gradient(135deg, rgba(255,255,255,0.75), rgba(245,247,250,0.85));
+    border-radius: 10px;
+    padding: 10px;
+    border: 1px solid rgba(255,255,255,0.4);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    transition: 0.2s ease;
 }
-
-.card:hover .priceChart {
-    box-shadow: inset 0 1px 6px rgba(0,0,0,0.12);
-}
-
 .card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 16px 40px rgba(0,0,0,0.12);
+    transform: translateY(-4px);
+    box-shadow: 0 10px 28px rgba(0,0,0,0.10);
 }
 
+/* Product Image */
 .card img {
     width: 100%;
-    max-height: 220px;
+    max-height: 130px;
     object-fit: contain;
-    border-radius: 12px;
     background: #f0f2f5;
-    padding: 10px;
-    border: 1px solid rgba(0,0,0,0.04);
-    margin-bottom: 14px;
-}
-
-.card h2 {
-    font-size: 18px;
-    margin: 10px 0 12px 0;
-    color: #222;
-    line-height: 1.3;
-    font-weight: 600;
-}
-
-.price-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 14px;
+    padding: 6px;
+    border-radius: 10px;
     margin-bottom: 6px;
 }
 
-.price-old {
-    color: #999;
-    text-decoration: line-through;
+/* Title */
+.card h2 {
+    font-size: 14px;
+    font-weight: 700;
+    color: #222;
+    margin: 6px 0 4px 0;
+    line-height: 1.35;
 }
 
-.price-new {
-    color: #0a8a00;
-    font-weight: bold;
+/* Last updated */
+.last-updated {
+    font-size: 10px;
+    color: #666;
+    margin-bottom: 6px;
 }
 
-.badge-drop {
-    background: linear-gradient(135deg, #0bcc4e, #08a83c);
-    color: white;
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-size: 13px;
+/* ===== REGION PRICE GRID ===== */
+
+.region-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 4px 8px;
+    margin-bottom: 8px;
+}
+
+.region-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f7f9fc;
+    padding: 4px 6px;
+    border-radius: 5px;
+    border: 1px solid rgba(0,0,0,0.06);
+    height: 26px;
+}
+
+.region-flag {
+    font-size: 14px;
+    width: 18px;
+}
+
+.region-price {
+    font-size: 11px;
     font-weight: 600;
-    display: inline-block;
-    margin-top: 10px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+    color: #222;
 }
+
+/* Trend Badges */
+.trend-up {
+    color: #0dbc3f;
+    font-weight: 700;
+    font-size: 10px;
+}
+.trend-down {
+    color: #e63946;
+    font-weight: 700;
+    font-size: 10px;
+}
+.trend-neutral {
+    color: #888;
+    font-size: 9px;
+}
+
+/* ===== SPARKLINE ===== */
+
+.sparkline {
+    width: 100%;
+    height: 30px;
+    margin-top: 6px;
+}
+.sparkline canvas {
+    width: 100%;
+    height: 30px;
+}
+
+/* ===== CARD ACTIONS ===== */
 
 .card-actions {
     display: flex;
     justify-content: space-between;
-    margin-top: 15px;
+    margin-top: 6px;
 }
 
 .view-btn {
     background: #0077ff;
     color: white;
-    padding: 8px 14px;
+    padding: 5px 10px;
     border-radius: 6px;
-    text-decoration: none;
-    font-size: 14px;
+    font-size: 11px;
     font-weight: bold;
+    text-decoration: none;
 }
-
-.view-btn:hover {
-    background: #005fcc;
-}
+.view-btn:hover { background: #005fcc; }
 
 .delete-btn {
     background: #ff3b3b;
     color: white;
-    border: none;
-    padding: 8px 14px;
+    padding: 5px 10px;
     border-radius: 6px;
+    border: none;
+    font-size: 11px;
     cursor: pointer;
-    font-size: 14px;
     font-weight: bold;
 }
-
-.delete-btn:hover {
-    background: #d62d2d;
-}
-
-/* Sparkline container */
-.sparkline {
-    width: 100%;
-    height: 48px;
-    margin-top: 12px;
-}
-
-.card {
-    position: relative;
-    overflow: hidden;
-    animation: fadeIn 0.4s ease;
-}
-
-/* Smooth entry animation */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* Sparkline canvas */
-.sparkline canvas {
-    width: 100%;
-    height: 40px;
-}
-
-/* Price chart canvas (Chart.js sparkline) */
-.priceChart {
-    width: 100% !important;
-    height: 85px !important;
-    margin-top: 14px;
-    margin-bottom: 14px;
-    display: block;
-    border-radius: 10px;
-    background: linear-gradient(180deg, #ffffff 0%, #f2f5f9 100%);
-    box-shadow: inset 0 1px 4px rgba(0,0,0,0.08);
-    padding: 6px;
-}
-
-/* Make price chart bigger + smoother */
-.priceChart {
-    height: 110px !important;
-    padding: 10px;
-    border-radius: 14px;
-}
-
-/* Gradient line colors (green → red glow) */
-.chart-gradient-line {
-    filter: drop-shadow(0 0 4px rgba(0, 255, 100, 0.4));
-}
-
-/* Glow + shadow effect */
-.priceChart {
-    box-shadow: inset 0 1px 8px rgba(0,0,0,0.15), 0 0 12px rgba(0,255,120,0.2);
-}
-
-/* Premium SaaS look */
-.card {
-    backdrop-filter: blur(8px);
-    background: linear-gradient(135deg, rgba(255,255,255,0.75), rgba(245,247,250,0.85));
-    border: 1px solid rgba(255,255,255,0.4);
-}
-
-/* Hover zoom animation */
-.priceChart:hover {
-    transform: scale(1.03);
-    transition: 0.25s ease;
-}
-
-/* Amazon‑style price formatting */
-.price-new {
-    font-size: 22px;
-    font-weight: 700;
-    letter-spacing: -0.5px;
-}
-
-.price-old {
-    font-size: 15px;
-}
-
-/* Card header & title polish */
-.card h2 {
-    font-size: 20px;
-    font-weight: 700;
-    letter-spacing: -0.3px;
-}
-
-/* Overall UI polish */
-body {
-    background: linear-gradient(180deg, #eef2f6 0%, #ffffff 100%);
-}
-
-.grid {
-    padding-bottom: 40px;
-}
-
-/* --- Region Price Grid (multi‑region price layout) --- */
-.region-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px 16px;
-    margin-top: 12px;
-    margin-bottom: 12px;
-}
-
-.region-box {
-    background: #f7f9fc;
-    padding: 8px 10px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 14px;
-    border: 1px solid rgba(0,0,0,0.06);
-}
-
-.region-flag {
-    font-size: 20px;
-    width: 26px;
-}
-
-.region-price {
-    font-weight: bold;
-    color: #222;
-}
-
-.region-trend-up {
-    color: #0dbc3f;
-    font-weight: bold;
-}
-
-.region-trend-down {
-    color: #e63946;
-    font-weight: bold;
-}
-
-.region-trend-none {
-    color: #888;
-    font-size: 12px;
-}
+.delete-btn:hover { background: #d62d2d; }
