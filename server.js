@@ -4,6 +4,7 @@ import cors from "cors";
 import trackRoute from "./routes/track.js";
 import checkPricesRoute from "./routes/check-prices.js"; // ✅ ADD THIS
 import productsRoute from "./routes/products.js";
+import deleteProductRoute from "./routes/delete-product.js";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -22,6 +23,7 @@ app.use(cors());
 app.use("/api/track", trackRoute);
 app.use("/api/check-prices", checkPricesRoute); // ✅ NOW IT WORKS
 app.use("/api/products", productsRoute);
+app.use("/api/delete", deleteProductRoute);
 // Root for testing
 app.get("/", (req, res) => {
     res.send("PriceGuard API is running");

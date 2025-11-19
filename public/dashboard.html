@@ -2,17 +2,28 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
+
+    <!-- Mobile-friendly scaling -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>PriceGuard Dashboard</title>
+
+    <!-- Premium Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="dashboard.css" />
 </head>
-<body>
+<body style="font-family: 'Inter', sans-serif;">
 
     <header>
         <h1>📊 PriceGuard Dashboard</h1>
         <button id="refreshBtn">🔄 Refresh</button>
     </header>
 
-    <section id="productContainer" class="grid"></section>
+    <!-- Container wrapper (better spacing on large screens) -->
+    <main style="max-width: 1200px; margin: auto;">
+        <section id="productContainer" class="grid"></section>
+    </main>
 
     <script src="dashboard.js"></script>
 </body>
