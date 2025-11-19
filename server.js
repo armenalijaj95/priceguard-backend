@@ -4,8 +4,16 @@ import cors from "cors";
 import trackRoute from "./routes/track.js";
 import checkPricesRoute from "./routes/check-prices.js"; // ✅ ADD THIS
 import productsRoute from "./routes/products.js";
+import path from "path";
+import { fileURLToPath } from "url";
 
 const app = express();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Serve static dashboard
+app.use(express.static(path.join(__dirname, "public")));
 
 app.use(express.json());
 app.use(cors());

@@ -1,0 +1,86 @@
+body {
+    background: #f5f7fa;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+h1 {
+    margin: 0;
+    font-size: 28px;
+    color: #333;
+}
+
+#refreshBtn {
+    padding: 10px 20px;
+    border: none;
+    background: #0077ff;
+    color: white;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+#refreshBtn:hover {
+    background: #005fcc;
+}
+
+.grid {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+}
+
+.card {
+    background: white;
+    border-radius: 12px;
+    padding: 15px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+}
+
+.card img {
+    width: 100%;
+    max-height: 220px;
+    object-fit: contain;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.card h2 {
+    font-size: 18px;
+    margin: 8px 0;
+    color: #333;
+}
+
+.price-row {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.price-old {
+    color: #999;
+    text-decoration: line-through;
+}
+
+.price-new {
+    color: #0a8a00;
+    font-weight: bold;
+}
+
+.badge-drop {
+    background: #0bcc4e;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 13px;
+    display: inline-block;
+    margin-top: 6px;
+}
