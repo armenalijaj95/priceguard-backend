@@ -10,6 +10,13 @@ const ProductSchema = new mongoose.Schema({
     title: String,
     image: String,
     url: String,
+
+    // NEW FIELDS
+    initialPrice: { type: Number, default: null },
+    latestPrice: { type: Number, default: null },
+    notified: { type: Boolean, default: false },
+
+    // PRICE HISTORY
     history: [PriceSchema]
 });
 
