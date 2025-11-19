@@ -1,116 +1,196 @@
 const API_BASE = "https://priceguard-backend.onrender.com";
 
+// 🌍 Regions we support
+const REGIONS = ["de", "it", "fr", "es", "uk", "us"];
+
+// 🌍 Country flags
+const REGION_FLAGS = {
+    de: "🇩🇪",
+    it: "🇮🇹",
+    fr: "🇫🇷",
+    es: "🇪🇸",
+    uk: "🇬🇧",
+    us: "🇺🇸"
+};
+
+// 💶 Currency symbols
+const REGION_CURRENCY = {
+    de: "€",
+    it: "€",
+    fr: "€",
+    es: "€",
+    uk: "£",
+    us: "$"
+};
+
+
+// 🔥 Render sparkline (already existing function)
+function generateSparkline(elementId, data) {
+    const container = document.getElementById(elementId);
+    if (!container) return;
+
+    const canvas = document.createElement("canvas");
+    container.innerHTML = "";
+    container.appendChild(canvas);
+
+    const ctx = canvas.getContext("2d");
+
+    const w = canvas.width = container.offsetWidth;
+    const h = canvas.height = 60;
+
+    const min = Math.min(...data);
+    const max = Math.max(...data);
+    const range = max - min || 1;
+
+    ctx.lineWidth = 3;
+
+    // Glow
+    ctx.shadowColor = "rgba(0, 150, 255, 0.9)";
+    ctx.shadowBlur = 12;
+
+    const gradient = ctx.createLinearGradient(0, 0, w, h);
+    gradient.addColorStop(0, "#00c8ff");
+    gradient.addColorStop(1, "#8a2be2");
+
+    ctx.strokeStyle = gradient;
+    ctx.beginPath();
+
+    const points = data.map((val, i) => ({
+        x: (i / (data.length - 1)) * w,
+        y: h - ((val - min) / range) * h
+    }));
+
+    ctx.moveTo(points[0].x, points[0].y);
+
+    for (let i = 1; i < points.length; i++) {
+        const cpX = (points[i - 1].x + points[i].x) / 2;
+        const cpY = (points[i - 1].y + points[i].y) / 2;
+        ctx.quadraticCurveTo(points[i - 1].x, points[i - 1].y, cpX, cpY);
+    }
+
+    ctx.stroke();
+
+    // Highlight min & max points
+    const extremes = [
+        { x: points[data.indexOf(min)].x, y: points[data.indexOf(min)].y, color: "#00ff99" },
+        { x: points[data.indexOf(max)].x, y: points[data.indexOf(max)].y, color: "#ff0077" }
+    ];
+
+    extremes.forEach(p => {
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = p.color;
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+        ctx.fill();
+    });
+}
+
+
+// 📌 Format prices with currency
+function formatPrice(price, region) {
+    if (!price && price !== 0) return "-";
+    const symbol = REGION_CURRENCY[region];
+    return `${price.toFixed(2)}${symbol}`;
+}
+
+
+// 🔥 Build product cards with multi-region data
 async function loadProducts() {
     const container = document.getElementById("productContainer");
-    container.innerHTML = "Loading...";
+    container.innerHTML = "Loading…";
 
     const res = await fetch(`${API_BASE}/api/products`);
     const data = await res.json();
 
-    if (!data.success || !data.products) {
+    if (!data.success) {
         container.innerHTML = "❌ Failed to load products";
         return;
     }
 
     container.innerHTML = "";
 
-    data.products.forEach(p => {
-        const initial = parseFloat(p.initialPrice || 0);
-        const latest = parseFloat(p.latestPrice || 0);
-
-        const priceDropPercent =
-            initial > 0 ? (((initial - latest) / initial) * 100).toFixed(1) : null;
-
+    data.products.forEach(product => {
         const card = document.createElement("div");
         card.className = "card";
 
-        let historyArray = (p.history || []).map(h => parseFloat(h.price));
-
-        // Ensure sparkline works even with small data
-        if (historyArray.length < 2) {
-            historyArray = [initial, latest];
-        }
-
+        // Build HTML
         card.innerHTML = `
-            <img src="${p.image}" />
+            <img src="${product.image || ""}" />
 
-            <h2>${p.title}</h2>
+            <h2>${product.title}</h2>
 
-            <div class="price-row">
-                <span class="price-old">${p.initialPriceDisplay || (initial ? initial.toFixed(2) + "€" : "-")}</span>
-                <span class="price-new">${p.latestPriceDisplay || (latest ? latest.toFixed(2) + "€" : "-")}</span>
+            <div style="font-size:13px; color:#555; margin-bottom:8px;">
+                Last updated: ${new Date(product.updatedAt || product.createdAt).toLocaleString()}
             </div>
 
-            ${priceDropPercent > 0 ? 
-                `<div class="badge-drop">⬇️ ${priceDropPercent}% price drop</div>` : ""
-            }
+            <div class="region-grid">
+                ${REGIONS.map(region => {
+                    const p = product.prices[region];
+                    const latest = p?.price || null;
 
-            <div class="sparkline" id="spark-${p.asin}"></div>
+                    const history = p?.history?.map(h => h.price) || [];
+                    const hasHistory = history.length > 1;
+
+                    let trendHtml = "";
+                    if (hasHistory) {
+                        const first = history[0];
+                        const last = history[history.length - 1];
+                        const change = (((last - first) / first) * 100).toFixed(1);
+
+                        if (change > 0) trendHtml = `<span class="trend-up">+${change}% ↑</span>`;
+                        else if (change < 0) trendHtml = `<span class="trend-down">${change}% ↓</span>`;
+                        else trendHtml = `<span class="trend-neutral">0%</span>`;
+                    }
+
+                    return `
+                        <div class="region-box">
+                            <div class="region-flag">${REGION_FLAGS[region]}</div>
+                            <div class="region-price">${latest ? formatPrice(latest, region) : "-"}</div>
+                            <div class="region-trend">${trendHtml}</div>
+                            <div class="sparkline" id="spark-${product.asin}-${region}"></div>
+                        </div>
+                    `;
+                }).join("")}
+            </div>
 
             <div class="card-actions">
-                <a href="${p.url}" target="_blank" class="view-btn">View Product</a>
-                <button class="delete-btn" onclick="deleteProduct('${p.asin}')">🗑 Delete</button>
+                <a href="${product.url}" target="_blank" class="view-btn">View Product</a>
+                <button class="delete-btn" onclick="deleteProduct('${product.asin}')">🗑 Delete</button>
             </div>
         `;
 
         container.appendChild(card);
 
-        // Draw sparkline
-        generateSparkline(`spark-${p.asin}`, historyArray);
+        // Draw sparkline for each region
+        REGIONS.forEach(region => {
+            const history = product.prices[region]?.history?.map(h => h.price);
+            if (history && history.length > 1) {
+                generateSparkline(`spark-${product.asin}-${region}`, history);
+            }
+        });
     });
 }
 
-// ---- Sparkline renderer ----
-function generateSparkline(elementId, data) {
-    const container = document.getElementById(elementId);
-    if (!container) return;
 
-    const canvas = document.createElement("canvas");
-    container.appendChild(canvas);
-
-    const ctx = canvas.getContext("2d");
-
-    const w = canvas.width = container.offsetWidth;
-    const h = canvas.height = 40;
-
-    const max = Math.max(...data);
-    const min = Math.min(...data);
-
-    ctx.strokeStyle = "#0077ff";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-
-    data.forEach((val, i) => {
-        const x = (i / (data.length - 1)) * w;
-        const y = h - ((val - min) / (max - min)) * h;
-
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-    });
-
-    ctx.stroke();
-}
-
-
-// ---- Delete Product ----
+// ❌ Delete product
 async function deleteProduct(asin) {
-    const confirmDelete = confirm("Are you sure you want to delete this product?");
-    if (!confirmDelete) return;
+    if (!confirm("Delete this product?")) return;
 
-    const response = await fetch(`${API_BASE}/api/delete/${asin}`, {
-        method: "DELETE"
-    });
+    const res = await fetch(`${API_BASE}/api/delete/${asin}`, { method: "DELETE" });
+    const data = await res.json();
 
-    const result = await response.json();
-
-    if (result.success) {
-        alert("Product deleted!");
-        loadProducts(); 
-    } else {
-        alert("Error deleting product");
+    if (!data.success) {
+        alert("❌ Failed to delete");
+        return;
     }
+
+    loadProducts();
 }
 
+
+// 🔄 Refresh button
 document.getElementById("refreshBtn").addEventListener("click", loadProducts);
 
+// Load on start
 loadProducts();

@@ -1,26 +1,49 @@
 import mongoose from "mongoose";
 
-const PriceSchema = new mongoose.Schema({
-    price: Number,
-    display: String,
-    date: { type: Date, default: Date.now }
+const priceRegionSchema = new mongoose.Schema({
+    price: { type: Number, default: null },
+    currency: { type: String, default: null },
+    availability: { type: String, default: null },
+    shipping: { type: String, default: null },
+    rawPrice: { type: String, default: null },
+    history: [
+        {
+            price: Number,
+            date: { type: Date, default: Date.now }
+        }
+    ]
 });
 
-const ProductSchema = new mongoose.Schema({
+const productSchema = new mongoose.Schema({
     asin: { type: String, required: true, unique: true },
     title: String,
-    image: String,
     url: String,
+    image: String,
+    availability: { type: String, default: null },
+    shipping: { type: String, default: null },
 
-    // NEW FIELDS
-    initialPrice: { type: Number, default: null },
-    initialPriceDisplay: { type: String, default: null },
-    latestPrice: { type: Number, default: null },
-    latestPriceDisplay: { type: String, default: null },
-    notified: { type: Boolean, default: false },
+    // 🌍 Multi-region pricing (Amazon DE, IT, FR, ES, UK, US)
+    prices: {
+        de: { type: priceRegionSchema, default: () => ({}) },
+        it: { type: priceRegionSchema, default: () => ({}) },
+        fr: { type: priceRegionSchema, default: () => ({}) },
+        es: { type: priceRegionSchema, default: () => ({}) },
+        uk: { type: priceRegionSchema, default: () => ({}) },
+        us: { type: priceRegionSchema, default: () => ({}) }
+    },
 
-    // PRICE HISTORY
-    history: [PriceSchema]
+    // 🛎 Notification flags per region
+    notified: {
+        de: { type: Boolean, default: false },
+        it: { type: Boolean, default: false },
+        fr: { type: Boolean, default: false },
+        es: { type: Boolean, default: false },
+        uk: { type: Boolean, default: false },
+        us: { type: Boolean, default: false }
+    },
+
+    createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now }
 });
 
-export const Product = mongoose.model("Product", ProductSchema);
+export const Product = mongoose.model("Product", productSchema);

@@ -1,78 +1,65 @@
-import "dotenv/config.js";
-import { connectDB } from "../db.js";
 import { Product } from "../models/Product.js";
 import { scrapeAmazonProduct } from "../utils/scraper.js";
 
-await connectDB();
-console.log("🔁 Running scheduled price check...");
+export async function runPriceCheck() {
+    console.log("🔎 Running automatic PriceGuard cron check...");
 
-async function checkPrices() {
     try {
-        // Fetch ALL tracked products
         const products = await Product.find({});
-        console.log(`📦 Checking ${products.length} products...`);
+        console.log(`📦 Checking ${products.length} tracked products...`);
 
         for (const product of products) {
-            console.log(`\n🔎 Checking ASIN ${product.asin} ...`);
+            console.log(`➡ Scraping multi-region for ASIN: ${product.asin}`);
 
-            // Scrape fresh data
-            const scraped = await scrapeAmazonProduct(product.url);
-            if (!scraped || !scraped.price) {
-                console.log(`⚠️ Could not scrape price for ${product.asin}`);
-                continue;
-            }
+            const scraped = await scrapeAmazonProduct(product.asin);
+            const regions = Object.keys(scraped);
 
-            const newPrice = parseFloat(scraped.price);
-            const oldPrice = product.latestPrice ? parseFloat(product.latestPrice) : null;
+            for (const region of regions) {
+                const data = scraped[region];
 
-            console.log(`💰 OLD: ${oldPrice} → NEW: ${newPrice}`);
+                const regionData = product.prices[region];
 
-            // FIRST TIME PRICE (initialPrice)
-            if (product.initialPrice === null && !isNaN(newPrice)) {
-                product.initialPrice = newPrice;
-            }
-
-            // PRICE HISTORY UPDATE
-            if (!isNaN(newPrice)) {
-                const lastEntry = product.history[product.history.length - 1];
-                if (!lastEntry || lastEntry.price !== newPrice) {
-                    product.history.push({
-                        price: newPrice,
-                        date: new Date()
-                    });
+                // Ensure regionData exists
+                if (!regionData) {
+                    product.prices[region] = { price: null, currency: data.currency, history: [], available: null, shipping: null };
                 }
-            }
 
-            // UPDATE latest price
-            product.latestPrice = newPrice;
+                // Update availability & shipping
+                if ("available" in data) product.prices[region].available = data.available;
+                if ("shipping" in data) product.prices[region].shipping = data.shipping;
 
-            // PRICE DROP DETECTION
-            if (
-                oldPrice !== null &&
-                !isNaN(oldPrice) &&
-                newPrice < oldPrice
-            ) {
-                console.log(`📉 PRICE DROP detected for ${product.asin}!`);
+                // Update pricing only if found
+                if (data.price !== null) {
+                    const oldPrice = product.prices[region].price;
+                    const newPrice = data.price;
 
-                product.notified = false; // allow notification again
+                    product.prices[region].price = newPrice;
+                    product.prices[region].currency = data.currency;
 
-                product.lastDrop = {
-                    old: oldPrice,
-                    new: newPrice,
-                    date: new Date()
-                };
+                    // Add to history only when changed
+                    if (oldPrice !== newPrice) {
+                        product.prices[region].history.push({
+                            price: newPrice,
+                            date: new Date()
+                        });
+
+                        console.log(`  🔄 ${region.toUpperCase()} price changed ${oldPrice} → ${newPrice}`);
+
+                        // Reset notification flag so browser can notify again
+                        if (product.notified && product.notified[region]) {
+                            product.notified[region] = false;
+                        }
+                    }
+                } else {
+                    console.log(`  ⚠ ${region.toUpperCase()} unavailable or missing`);
+                }
             }
 
             await product.save();
         }
 
-        console.log("\n✅ Price check completed.");
-        process.exit(0);
-
+        console.log("✅ Price check finished\n");
     } catch (err) {
-        console.error("❌ checkPrices ERROR:", err);
-        process.exit(1);
+        console.error("❌ Cron job error:", err);
     }
 }
-
-checkPrices();

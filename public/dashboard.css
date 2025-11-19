@@ -47,6 +47,10 @@ h1 {
     transition: transform 0.2s ease, box-shadow 0.25s ease;
 }
 
+.card:hover .priceChart {
+    box-shadow: inset 0 1px 6px rgba(0,0,0,0.12);
+}
+
 .card:hover {
     transform: translateY(-6px);
     box-shadow: 0 16px 40px rgba(0,0,0,0.12);
@@ -139,7 +143,7 @@ h1 {
 /* Sparkline container */
 .sparkline {
     width: 100%;
-    height: 40px;
+    height: 48px;
     margin-top: 12px;
 }
 
@@ -159,4 +163,119 @@ h1 {
 .sparkline canvas {
     width: 100%;
     height: 40px;
+}
+
+/* Price chart canvas (Chart.js sparkline) */
+.priceChart {
+    width: 100% !important;
+    height: 85px !important;
+    margin-top: 14px;
+    margin-bottom: 14px;
+    display: block;
+    border-radius: 10px;
+    background: linear-gradient(180deg, #ffffff 0%, #f2f5f9 100%);
+    box-shadow: inset 0 1px 4px rgba(0,0,0,0.08);
+    padding: 6px;
+}
+
+/* Make price chart bigger + smoother */
+.priceChart {
+    height: 110px !important;
+    padding: 10px;
+    border-radius: 14px;
+}
+
+/* Gradient line colors (green → red glow) */
+.chart-gradient-line {
+    filter: drop-shadow(0 0 4px rgba(0, 255, 100, 0.4));
+}
+
+/* Glow + shadow effect */
+.priceChart {
+    box-shadow: inset 0 1px 8px rgba(0,0,0,0.15), 0 0 12px rgba(0,255,120,0.2);
+}
+
+/* Premium SaaS look */
+.card {
+    backdrop-filter: blur(8px);
+    background: linear-gradient(135deg, rgba(255,255,255,0.75), rgba(245,247,250,0.85));
+    border: 1px solid rgba(255,255,255,0.4);
+}
+
+/* Hover zoom animation */
+.priceChart:hover {
+    transform: scale(1.03);
+    transition: 0.25s ease;
+}
+
+/* Amazon‑style price formatting */
+.price-new {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+.price-old {
+    font-size: 15px;
+}
+
+/* Card header & title polish */
+.card h2 {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+}
+
+/* Overall UI polish */
+body {
+    background: linear-gradient(180deg, #eef2f6 0%, #ffffff 100%);
+}
+
+.grid {
+    padding-bottom: 40px;
+}
+
+/* --- Region Price Grid (multi‑region price layout) --- */
+.region-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px 16px;
+    margin-top: 12px;
+    margin-bottom: 12px;
+}
+
+.region-box {
+    background: #f7f9fc;
+    padding: 8px 10px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 14px;
+    border: 1px solid rgba(0,0,0,0.06);
+}
+
+.region-flag {
+    font-size: 20px;
+    width: 26px;
+}
+
+.region-price {
+    font-weight: bold;
+    color: #222;
+}
+
+.region-trend-up {
+    color: #0dbc3f;
+    font-weight: bold;
+}
+
+.region-trend-down {
+    color: #e63946;
+    font-weight: bold;
+}
+
+.region-trend-none {
+    color: #888;
+    font-size: 12px;
 }

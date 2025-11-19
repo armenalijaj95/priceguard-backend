@@ -7,6 +7,8 @@ import productsRoute from "./routes/products.js";
 import deleteProductRoute from "./routes/delete-product.js";
 import path from "path";
 import { fileURLToPath } from "url";
+import cron from "node-cron";
+import { runPriceCheck } from "./cron/checkPrices.js";
 
 const app = express();
 
@@ -34,6 +36,12 @@ mongoose
     .connect(process.env.MONGO_URI, { dbName: "priceguard" })
     .then(() => console.log("MongoDB connected"))
     .catch((err) => console.error("MongoDB error:", err));
+
+// Automatic cron job: run price check every 30 minutes
+cron.schedule("*/30 * * * *", () => {
+    console.log("⏱ Running scheduled multi-region price check...");
+    runPriceCheck();
+});
 
 // PORT
 const PORT = process.env.PORT || 8080;
